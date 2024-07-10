@@ -1,7 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+/*
+This file is part of a Unity-based space simulation framework.
+Copyright (c) 2024 Tejaswi Gorti
+Licensed under the MIT License. See the LICENSE file in the project root for more information.
+*/
 
+/// <summary>
+/// Author: Tejaswi Gorti
+/// Description: Constants is a static class that defines all scientific
+///             constants in SI units used in calculations
+/// </summary>
+/// 
 public static class Constants
 {
     public const int MIN_STAR_TEMP = 2000;                                  // Kelvin
