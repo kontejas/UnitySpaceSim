@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4154491506251526627
+--- !u!114 &-8364294874762506354
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,6 +109,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EmissionIntensity: 15
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossinessSource: 0
@@ -129,6 +130,7 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _UVSec: 0
+    - _XFade: 0
     - _ZWrite: 1
     m_Colors:
     - Color_B354DC38: {r: 0.7924528, g: 0.70627004, b: 0.42239228, a: 0}

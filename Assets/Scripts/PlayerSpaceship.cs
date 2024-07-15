@@ -1,3 +1,9 @@
+/*
+This file is part of a Unity-based space simulation framework.
+Copyright (c) 2024 Tejaswi Gorti
+Licensed under the MIT License. See the LICENSE file in the project root for more information.
+*/
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,9 +18,14 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 
-// This class is derived from Dan Pos's YouTube tutorial:
-// https://www.youtube.com/watch?v=fZvJvZA4nhY
-
+/// <summary>
+/// Author: Tejaswi Gorti
+/// Description: PlayerSpaceship is a singleton object which defines all methods for
+///             the spaceship GameObject and its ability to traverse the universe.
+///             Coroutines for warp travel and short range movement are defined and
+///             tied to input controls/keybindings.
+/// </summary>
+/// 
 [RequireComponent(typeof(Rigidbody))]
 
 public class PlayerSpaceship : MonoBehaviour
@@ -51,7 +62,7 @@ public class PlayerSpaceship : MonoBehaviour
     public CelestialObject WarpOrigin { get; set; }
     public CelestialObject WarpDestination { get; set; }
     [SerializeField]
-    private GameObject sunLight;
+    private DirectionalLightUpdate sunLight;
     [SerializeField]
     private GameObject mainCamera;
     [SerializeField]
@@ -163,8 +174,6 @@ public class PlayerSpaceship : MonoBehaviour
     void Stabilize(float duration)
     {
         Vector3 currentAngularVelocity = rb.angularVelocity;
-        Vector3 currentPosition = transform.position;
-        Quaternion currentRotation = transform.rotation;
         virtualNearFieldCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0.0f;
         Vector3 dampingAmount = virtualNearFieldCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().Damping;
         virtualNearFieldCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().Damping = Vector3.zero;
@@ -174,13 +183,8 @@ public class PlayerSpaceship : MonoBehaviour
         while (elapsedTime < duration)
         {
             rb.angularVelocity = Vector3.Lerp(currentAngularVelocity, Vector3.zero, (elapsedTime / duration));
-            transform.position = Vector3.Lerp(currentPosition, planetaryLevelCamera.transform.position, (elapsedTime / duration));
-            transform.rotation = Quaternion.Lerp(currentRotation, planetaryLevelCamera.transform.rotation, (elapsedTime / duration));
             elapsedTime += Time.deltaTime;
         }
-
-        transform.rotation = planetaryLevelCamera.transform.rotation;
-        transform.position = planetaryLevelCamera.transform.position;
         virtualNearFieldCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().Damping = dampingAmount;
 
     }
@@ -281,9 +285,6 @@ public class PlayerSpaceship : MonoBehaviour
     {
         foreach (GameObject thruster in shipMainThrusters)
         {
-            //Color currentThrusterColor = thruster.GetComponent<MeshRenderer>().material.GetColor("_EmissionColor");
-            //thrustColor.a = thrust1D;
-
             thruster.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", Color.white * intensity);
         }
         ParticleSystem.EmissionModule em;
@@ -483,7 +484,6 @@ public class PlayerSpaceship : MonoBehaviour
         }
     }
 
-
     IEnumerator InterPlanetaryWarpRoutine(float duration)
     {
         Vector3 startPos = planetaryLevelCamera.transform.position;
@@ -515,52 +515,6 @@ public class PlayerSpaceship : MonoBehaviour
         yield return InterPlanetaryWarp(warpDuration, startPos, endPos);
     }
 
-    IEnumerator IntraPlanetaryWarpRoutine(float duration)
-    {
-        Vector3 startPos = planetaryLevelCamera.transform.position;
-        Vector3 directionalUnitVector = WarpDestination.transform.position - startPos;
-        directionalUnitVector.Normalize();
-        Vector3 endPos = WarpDestination.transform.position - (1.3f * (float)WarpDestination.GetComponent<CelestialObject>().radiusInEarthRadii) * directionalUnitVector;
-        WarpDestination.TryGetComponent<Planet>(out Planet destinationPlanet);
-        if (destinationPlanet != null)
-            WarpDestination.GetComponent<Planet>().SetXFadeLimits((endPos - startPos).magnitude);
-
-        float stabilizeDuration, alignmentDuration, warpDuration;
-        if (duration > 10f)
-        {
-            stabilizeDuration = 1f;
-            alignmentDuration = 5f;
-            warpDuration = duration - 6f;
-        }
-        else
-        {
-            stabilizeDuration = 0.1f * duration;
-            alignmentDuration = 0.2f * duration;
-            warpDuration = 0.7f * duration;
-        }
-
-        Stabilize(stabilizeDuration);
-        yield return AlignToDestination(alignmentDuration, startPos, endPos);
-        WarpOrigin = WarpDestination;
-        WarpDestination = null;
-        yield return IntraPlanetaryWarp(warpDuration, startPos, endPos);
-    }
-
-    //IEnumerator IntraPlanetaryWarpRoutine(float duration)
-    //{
-    //    Vector3 startPos = planetaryLevelCamera.transform.position;
-    //    Vector3 directionalUnitVector = WarpDestination.transform.position - startPos;
-    //    directionalUnitVector.Normalize();
-    //    Vector3 endPos = WarpDestination.transform.position - (1.3f * (float)WarpDestination.GetComponent<Planet>().radiusInEarthRadii) * directionalUnitVector;
-    //    WarpDestination.GetComponent<Planet>().SetXFadeLimits((endPos - startPos).magnitude);
-
-    //    Stabilize(1f);
-    //    yield return AlignToDestination(5f, startPos, endPos);
-    //    WarpOrigin = WarpDestination;
-    //    WarpDestination = null;
-    //    yield return WarpSpeed(duration - 6f, startPos, endPos);
-    //}
-
     private Coroutine alignToDestinationRoutine;
     private Coroutine warpToDestRoutine;
 
@@ -586,7 +540,7 @@ public class PlayerSpaceship : MonoBehaviour
                 nearFieldCamera.transform.rotation = rot;
                 planetaryLevelCamera.transform.rotation = rot;
                 transform.rotation = rot;
-                sunLight.GetComponent<DirectionalLightTowardsTarget>().UpdateLighting();
+                sunLight.UpdateLighting();
             },
             null
         ));
@@ -601,8 +555,8 @@ public class PlayerSpaceship : MonoBehaviour
         float warpVFXCameraWidenAmount;
         ColorAdjustments colorAdjustments;
         VolumeProfile volumeProfile = globalVolume.GetComponent<Volume>()?.profile;
-        if (!volumeProfile) throw new System.NullReferenceException(nameof(VolumeProfile));
-        if (!volumeProfile.TryGet(out UnityEngine.Rendering.Universal.Vignette vignette)) throw new System.NullReferenceException(nameof(vignette));
+        if (!volumeProfile) throw new NullReferenceException(nameof(VolumeProfile));
+        if (!volumeProfile.TryGet(out Vignette vignette)) throw new System.NullReferenceException(nameof(vignette));
 
         volumeProfile.TryGet<ColorAdjustments>(out colorAdjustments);
         if (colorAdjustments == null)
@@ -639,71 +593,13 @@ public class PlayerSpaceship : MonoBehaviour
                 nearFieldCamera.transform.position = pos;
                 transform.position = pos;
                 planetaryLevelCamera.GetComponent<ScaledCamera>().EstablishCameraOrientation();
-                sunLight.GetComponent<DirectionalLightTowardsTarget>().UpdateLighting();
+                sunLight.UpdateLighting();
             },
             null
         ));
         warpVFX.SetFloat("WarpAmount", 0f);
         virtualNearFieldCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0f;
-        //planetaryLevelCamera.transform.position = endPos;
-        ////nearFieldCamera.transform.position = endPos;
-        //transform.position = endPos;
-        warpVFX.Stop();
-
-    }
-
-    private IEnumerator IntraPlanetaryWarp(float animationDuration, Vector3 startPos, Vector3 endPos)
-    {
-        float fovWidenRate = 2f;
-        float warpVFXAmount = warpVFX.GetFloat("WarpAmount");
-        float warpVFXCameraWidenAmount;
-        ColorAdjustments colorAdjustments;
-        VolumeProfile volumeProfile = globalVolume.GetComponent<Volume>()?.profile;
-        if (!volumeProfile) throw new System.NullReferenceException(nameof(VolumeProfile));
-        if (!volumeProfile.TryGet(out UnityEngine.Rendering.Universal.Vignette vignette)) throw new System.NullReferenceException(nameof(vignette));
-
-        volumeProfile.TryGet<ColorAdjustments>(out colorAdjustments);
-        if (colorAdjustments == null)
-            Debug.LogError("No ColorAdjustments found on profile");
-
-        float currentVignetteIntensity = vignette.intensity.GetValue<float>();
-
-
-        this.EnsureCoroutineStopped(ref warpToDestRoutine);
-        warpVFX.Play();
-
-        yield return StartCoroutine(AnimationRoutine(
-            animationDuration,
-            delegate (float progress)
-            {
-                float easedProgress = Easing.easeInOutSine(0, 1, progress);
-                warpVFXAmount = easedProgress * (1 - easedProgress);
-                warpVFXCameraWidenAmount = 30f * warpVFXAmount + 1f;
-                warpVFX.SetFloat("WarpAmount", warpVFXCameraWidenAmount);
-
-                nearFieldCamera.GetComponent<Camera>().fieldOfView = warpVFXCameraWidenAmount * fovWidenRate + 40f;
-                planetaryLevelCamera.GetComponent<Camera>().fieldOfView = warpVFXCameraWidenAmount * fovWidenRate + 40f;
-                solarSystemLevelCamera.GetComponent<Camera>().fieldOfView = warpVFXCameraWidenAmount * fovWidenRate + 40f;
-                mainCamera.GetComponent<Camera>().fieldOfView = warpVFXCameraWidenAmount * fovWidenRate + 40f;
-                virtualNearFieldCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0.2f * warpVFXCameraWidenAmount;
-                CMBSphere.GetComponent<MeshRenderer>().material.SetFloat("_Intensity", 0.08f * warpVFXAmount);
-                vignette.intensity.Override(0.1f + 2f * warpVFXAmount);
-                colorAdjustments.hueShift.Override(-56f * warpVFXAmount);
-
-                setThrusterIntensity(warpVFXAmount * 5f);
-
-                Vector3 pos = Vector3.Lerp(startPos, endPos, easedProgress);
-                //planetaryLevelCamera.transform.position = pos;
-                nearFieldCamera.transform.position = pos;
-                transform.position = pos;
-                planetaryLevelCamera.GetComponent<ScaledCamera>().EstablishCameraOrientation();
-                sunLight.GetComponent<DirectionalLightTowardsTarget>().UpdateLighting();
-            },
-            null
-        ));
-        warpVFX.SetFloat("WarpAmount", 0f);
-        virtualNearFieldCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0f;
-        //planetaryLevelCamera.transform.position = endPos;
+        planetaryLevelCamera.transform.position = endPos;
         ////nearFieldCamera.transform.position = endPos;
         //transform.position = endPos;
         warpVFX.Stop();

@@ -1,11 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
+/*
+This file is part of a Unity-based space simulation framework.
+Copyright (c) 2024 Tejaswi Gorti
+Licensed under the MIT License. See the LICENSE file in the project root for more information.
+*/
 using UnityEngine;
 
+/// <summary>
+/// Author: Tejaswi Gorti
+/// Description: ScaledCamera is attached to a particular camera layer in the camera stack
+///             so that it is continually updates its position and rotation relative to another
+///             camera in the stack. It ensures that all cameras are synced according to a
+///             ScaleFactor. For example, the Star-Level camera moves at 1/10000th the speed of the
+///             Planetary-Level camera.
+/// </summary>
+/// 
 public class ScaledCamera : MonoBehaviour
 {
     [SerializeField] public GameObject objectToFollow;
-    [SerializeField] public float ScaleFactor;
+    [SerializeField] private float ScaleFactor;
 
     private Vector3 pos, fw, up;
     private Vector3 offset;

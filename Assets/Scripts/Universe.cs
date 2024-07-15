@@ -32,7 +32,7 @@ public class Universe : MonoBehaviour
             _instance = this;
         }
         objects = new List<CelestialObject>();
-
+        getSolarSystemObjects();
         var path = "/Users/tejaswi/Dev_Workspace/Unity/UnitySpaceSim/Assets/Scripts/bright_star_catalogue.csv";
         StreamReader reader = new StreamReader(path);
         var fileContent = reader.ReadToEnd();
@@ -88,5 +88,42 @@ public class Universe : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void getSolarSystemObjects()
+    {
+        objects.Add(GameObject.Find("/Universe/Solar System/Sun").GetComponent<CelestialObject>());
+        objects.Add(GameObject.Find("/Universe/Solar System/Mercury").GetComponent<CelestialObject>());
+        objects.Add(GameObject.Find("/Universe/Solar System/Venus").GetComponent<CelestialObject>());
+
+        CelestialObject earth = GameObject.Find("/Universe/Solar System/Earth").GetComponent<CelestialObject>();
+        CelestialObject moon = GameObject.Find("/Universe/Solar System/Earth/Moon").GetComponent<CelestialObject>();
+        objects.Add(earth);
+        objects.Add(moon);
+        //((Planet)earth).NaturalSatellites = new List<NaturalSatellite>();
+        //((Planet)earth).NaturalSatellites.Add((NaturalSatellite)moon);
+
+
+        objects.Add(GameObject.Find("/Universe/Solar System/Mars").GetComponent<CelestialObject>());
+
+        CelestialObject jupiter = GameObject.Find("/Universe/Solar System/Jupiter").GetComponent<CelestialObject>();
+        //CelestialObject io = GameObject.Find("/Universe/Solar System/Jupiter/Io").GetComponent<CelestialObject>();
+        //CelestialObject europa = GameObject.Find("/Universe/Solar System/Jupiter/Europa").GetComponent<CelestialObject>();
+        //CelestialObject ganymede = GameObject.Find("/Universe/Solar System/Jupiter/Ganymede").GetComponent<CelestialObject>();
+        //CelestialObject callisto = GameObject.Find("/Universe/Solar System/Jupiter/Callisto").GetComponent<CelestialObject>();
+        objects.Add(jupiter);
+        //objects.Add(io);
+        //objects.Add(europa);
+        //objects.Add(ganymede);
+        //objects.Add(callisto);
+        //((Planet)jupiter).NaturalSatellites = new List<NaturalSatellite>();
+        //((Planet)jupiter).NaturalSatellites.Add((NaturalSatellite)io);
+        //((Planet)jupiter).NaturalSatellites.Add((NaturalSatellite)europa);
+        //((Planet)jupiter).NaturalSatellites.Add((NaturalSatellite)ganymede);
+        //((Planet)jupiter).NaturalSatellites.Add((NaturalSatellite)callisto);
+
+        objects.Add(GameObject.Find("/Universe/Solar System/Saturn").GetComponent<CelestialObject>());
+        objects.Add(GameObject.Find("/Universe/Solar System/Uranus").GetComponent<CelestialObject>());
+        objects.Add(GameObject.Find("/Universe/Solar System/Neptune").GetComponent<CelestialObject>());
     }
 }

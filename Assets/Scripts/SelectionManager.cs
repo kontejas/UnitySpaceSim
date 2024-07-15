@@ -1,17 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.Events;
+/*
+This file is part of a Unity-based space simulation framework.
+Copyright (c) 2024 Tejaswi Gorti
+Licensed under the MIT License. See the LICENSE file in the project root for more information.
+*/
 
+using UnityEngine;
+using UnityEngine.UI;
+
+
+/// <summary>
+/// Author: Tejaswi Gorti
+/// Description: SelectionManager class defines the user's click and point interaction
+///             with the Universe. It defines the methods for populating the UI with
+///             CelestialObject information and setting warp destinations.This is a singleton class.
+/// </summary>
+/// 
 public class SelectionManager : MonoBehaviour
 {
     private static SelectionManager _instance;
     public static SelectionManager Instance { get { return _instance; } }
     private int stellarLayerMask;
     private int planetaryLayerMask;
-    private int satelliteLayerMask;
 
     private const string selectableTag = "Selectable";
     [SerializeField] private Universe universe;
@@ -42,7 +51,6 @@ public class SelectionManager : MonoBehaviour
     {
         stellarLayerMask = 1 << LayerMask.NameToLayer("Stellar-Level Camera");
         planetaryLayerMask = 1 << LayerMask.NameToLayer("Planetary-Level Camera");
-        satelliteLayerMask = 1 << LayerMask.NameToLayer("Satellite");
     }
 
     // Update is called once per frame
@@ -51,19 +59,16 @@ public class SelectionManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit planetaryHit, stellarHit, satelliteHit;
+            RaycastHit planetaryHit, stellarHit;
             float radius = 5f;
             float distance = 500f;
             
             Ray ray_planetary = planetaryLevelCamera.ScreenPointToRay(Input.mousePosition);
             Ray ray_stellar = starSystemLevelCamera.ScreenPointToRay(Input.mousePosition);
-            Ray ray_satellite = planetaryLevelCamera.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.SphereCast(ray_planetary, radius, out planetaryHit, distance, planetaryLayerMask))
             {
-                Debug.Log(planetaryHit.transform.name);
                 var celestialObject = planetaryHit.transform.GetComponent<CelestialObject>();
-                Debug.DrawRay(planetaryLevelCamera.transform.position, celestialObject.transform.position, Color.cyan, 1f);
                 
                 if (celestialObject.CheckDerived() == "Planet")
                 {
@@ -85,9 +90,7 @@ public class SelectionManager : MonoBehaviour
             }
             else if (Physics.SphereCast(ray_stellar, radius, out stellarHit, distance, stellarLayerMask))
             {
-                //Debug.Log(stellarHit.transform.name);
                 var celestialObject = stellarHit.transform.GetComponent<CelestialObject>();
-                //Debug.DrawRay(starSystemLevelCamera.transform.position, celestialObject.transform.position, Color.green, 1f);
 
                 if (celestialObject.CheckDerived() == "Star")
                 {

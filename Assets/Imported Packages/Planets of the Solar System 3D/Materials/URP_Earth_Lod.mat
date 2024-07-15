@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: URP_Earth_Lod
-  m_Shader: {fileID: -6465566751694194690, guid: 9613165056b174b1c95b1c3ddf7a2d1a,
+  m_Shader: {fileID: -6465566751694194690, guid: bb554d84e8589415386a1ce369512434,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -96,6 +96,8 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EmissionIntensity: 12.92
+    - _Emission_Intensity: 10
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossinessSource: 0
@@ -116,15 +118,16 @@ Material:
     - _SrcBlend: 1
     - _Surface: 0
     - _UVSec: 0
+    - _XFade: 0
     - _ZWrite: 1
     m_Colors:
-    - Color_B354DC38: {r: 1, g: 1, b: 1, a: 0}
+    - Color_B354DC38: {r: 0, g: 0.6055045, b: 1, a: 1}
     - _BaseColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
   m_BuildTextureStacks: []
---- !u!114 &2674524090391110189
+--- !u!114 &3314238632288887682
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

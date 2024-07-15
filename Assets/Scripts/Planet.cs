@@ -70,7 +70,7 @@ public class Planet : CelestialObject
         }
         if (distanceToPlanet > 16)
         {
-            distantPlanetShaderGraphMat.SetFloat("_EmissionIntensity", maxEmissionIntensity / (1 + Mathf.Exp(-(distanceToPlanet - xFadeStartDistanceLimit))));
+            distantPlanetShaderGraphMat.SetFloat("_EmissionIntensity", maxEmissionIntensity / (1 + Mathf.Exp(-2*(distanceToPlanet - xFadeStartDistanceLimit))));
         }
     }
 
