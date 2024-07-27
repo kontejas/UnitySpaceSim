@@ -20,7 +20,7 @@ MonoBehaviour:
     x: 439
     y: -190
     width: 926
-    height: 2013
+    height: 2032
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1982,7 +1982,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 5
+      m_SerializableObject: 0
     m_Space: 2147483647
   m_Property:
     name: attractionSpeed
@@ -2700,9 +2700,10 @@ MonoBehaviour:
     linkedSlots:
     - outputSlot: {fileID: 8926484042661614682}
       inputSlot: {fileID: 8926484042661614677}
-    position: {x: 806.5, y: 1613}
-    expandedSlots: []
-    expanded: 0
+    position: {x: 694.5, y: 1614.5}
+    expandedSlots:
+    - {fileID: 8926484042661614682}
+    expanded: 1
 --- !u!114 &8926484042661614682
 MonoBehaviour:
   m_ObjectHideFlags: 0

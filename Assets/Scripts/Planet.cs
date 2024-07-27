@@ -58,7 +58,7 @@ public class Planet : CelestialObject
     public void SetPlanetScale()
     {
         distanceToPlanet = Vector3.Distance(planetaryLevelCamera.transform.position, transform.position);
-        float scaleFactor = (float)radiusInEarthRadii * Mathf.Exp(-distanceToPlanet / 27f);
+        float scaleFactor = (float)radiusInEarthRadii * Mathf.Exp(-distanceToPlanet / 10f);
         if (scaleFactor < 0.1f) scaleFactor = 0.1f;
         transform.localScale = scaleFactor * Vector3.one;
 
