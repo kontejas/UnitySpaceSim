@@ -152,7 +152,12 @@ public class PlayerSpaceship : MonoBehaviour
     {
         HandleBoosting();
         HandleMovement();
+        HandleInterPlanetaryWarp();
+        HandleStabilization();
+    }
 
+    private void HandleInterPlanetaryWarp()
+    {
         if (Input.GetKeyDown(KeyCode.Z))
         {
             if (SelectionManager.Instance.SelectedObject.CheckDerived() == "Planet" || SelectionManager.Instance.SelectedObject.CheckDerived() == "NaturalSatellite")
@@ -164,7 +169,10 @@ public class PlayerSpaceship : MonoBehaviour
                 StartCoroutine(InterPlanetaryWarpRoutine(distanceToDestination / 2.0f));
             }
         }
+    }
 
+    private void HandleStabilization()
+    {
         if (Input.GetKeyDown(KeyCode.X))
         {
             Stabilize(1000f);
@@ -249,12 +257,7 @@ public class PlayerSpaceship : MonoBehaviour
         movementParticleSystem.transform.LookAt(rb.velocity);
         var psMain = movementParticleSystem.main;
         psMain.simulationSpeed = rb.velocity.magnitude;
-
-
-
         HandleThrustVectoring();
-
-
 
         // Up / Down
         if (upDown1D > 0.1f || upDown1D < -0.1f)
@@ -487,12 +490,14 @@ public class PlayerSpaceship : MonoBehaviour
     IEnumerator InterPlanetaryWarpRoutine(float duration)
     {
         Vector3 startPos = planetaryLevelCamera.transform.position;
-        Vector3 directionalUnitVector = WarpDestination.transform.position - startPos;
-        directionalUnitVector.Normalize();
-        Vector3 endPos = WarpDestination.transform.position - (1.3f * (float)WarpDestination.GetComponent<CelestialObject>().radiusInEarthRadii) * directionalUnitVector;
+        Vector3 warpDirection = WarpDestination.transform.position - startPos;
+        warpDirection.Normalize();
+        Vector3 endPos = WarpDestination.transform.position - (1.3f * (float)WarpDestination.GetComponent<CelestialObject>().radiusInEarthRadii) * warpDirection;
         WarpDestination.TryGetComponent<Planet>(out Planet destinationPlanet);
         if (destinationPlanet != null)
             WarpDestination.GetComponent<Planet>().SetXFadeLimits((endPos - startPos).magnitude);
+        else
+            yield break;
 
         float stabilizeDuration, alignmentDuration, warpDuration;
         if (duration > 10f)
@@ -525,10 +530,13 @@ public class PlayerSpaceship : MonoBehaviour
 
         Quaternion startRotation = planetaryLevelCamera.transform.rotation;
         Vector3 startForwardVector = planetaryLevelCamera.transform.forward;
-        Vector3 endForwardVector = endPos - startPos;
+        Vector3 endForwardVector = endPos - startPos;   // Vector looking into the center of the destination planet
         endForwardVector.Normalize();
-
         Quaternion endRotation = Quaternion.LookRotation(endForwardVector);
+
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = planetaryLevelCamera.transform.position;
+        //virtualNearFieldCamera.TryGetComponent<CinemachineFramingTransposer>(out CinemachineFramingTransposer follow);
 
         yield return StartCoroutine(AnimationRoutine(
             animationDuration,
@@ -536,10 +544,11 @@ public class PlayerSpaceship : MonoBehaviour
             {
                 float easedProgress = Easing.easeInOutSine(0, 1, progress);
                 Quaternion rot = Quaternion.Lerp(startRotation, endRotation, easedProgress);
-
+                Vector3 pos = Vector3.Lerp(startPosition, endPosition, easedProgress);
                 nearFieldCamera.transform.rotation = rot;
                 planetaryLevelCamera.transform.rotation = rot;
                 transform.rotation = rot;
+                transform.position = pos;
                 sunLight.UpdateLighting();
             },
             null

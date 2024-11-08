@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: URP_Earth_2k
-  m_Shader: {fileID: -6465566751694194690, guid: 9613165056b174b1c95b1c3ddf7a2d1a,
+  m_Shader: {fileID: -6465566751694194690, guid: e19b78d863378fc4799b9ebd9cbf743e,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

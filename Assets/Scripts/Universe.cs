@@ -33,7 +33,7 @@ public class Universe : MonoBehaviour
         }
         objects = new List<CelestialObject>();
         getSolarSystemObjects();
-        var path = "/Users/tejaswi/Dev_Workspace/Unity/UnitySpaceSim/Assets/Scripts/bright_star_catalogue.csv";
+        var path = "Assets\\Scripts\\bright_star_catalogue.csv";
         StreamReader reader = new StreamReader(path);
         var fileContent = reader.ReadToEnd();
 
